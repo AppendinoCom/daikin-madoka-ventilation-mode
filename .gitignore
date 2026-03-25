@@ -1,0 +1,17 @@
+# ESPHome build artifacts
+.esphome/
+
+# Secrets (contain WiFi passwords, API keys, MAC addresses)
+secrets.yaml
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
