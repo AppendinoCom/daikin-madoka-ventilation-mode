@@ -1,6 +1,6 @@
 # Daikin Madoka BLE Bridge — ESPHome Component
 
-Custom [ESPHome](https://esphome.io/) component for controlling **Daikin Madoka BRC1H** thermostats via Bluetooth Low Energy (BLE) using an **ESP32-S3** as a wireless bridge to Home Assistant.
+Custom [ESPHome](https://esphome.io/) component for controlling **Daikin Madoka BRC1H** thermostats via Bluetooth Low Energy (BLE) using an **ESP32** as a wireless bridge to Home Assistant.
 
 Built specifically for **ventilation / recuperation units** (Daikin Sky Air with BRC1H52W controller).
 
@@ -21,16 +21,31 @@ Built specifically for **ventilation / recuperation units** (Daikin Sky Air with
 
 ## Hardware
 
-- **ESP32-S3 DevKitC-1** (or any ESP32-S3 board with BLE support)
+### Supported Boards
+
+| Board | Chip | Example Config |
+|-------|------|----------------|
+| **Seeed XIAO ESP32-S3** | ESP32-S3 | [`example-seeed-xiao-esp32s3.yaml`](example-seeed-xiao-esp32s3.yaml) |
+| **M5Stack Atom Echo** | ESP32-PICO | [`example-m5stack-atom-echo.yaml`](example-m5stack-atom-echo.yaml) |
+
+Any ESP32 board with BLE support should work — the configs above are tested and ready to use.
+
+### Target Device
+
 - **Daikin BRC1H** thermostat (tested with BRC1H52W, firmware 1.10.3)
 
 The ESP32 connects to the BRC1H over BLE using LE Secure Connections with automatic Numeric Comparison pairing. No manual pairing steps needed — the firmware handles everything.
+
+> **Note:** The M5Stack Atom Echo config uses the board only as a BLE bridge — its microphone and speaker are not used.
 
 ## Installation
 
 ### 1. Add the component to your ESPHome config
 
-Copy [`example.yaml`](example.yaml) to your ESPHome config directory and modify it for your setup.
+Copy the example config for your board to your ESPHome config directory and modify it for your setup:
+
+- **Seeed XIAO ESP32-S3:** [`example-seeed-xiao-esp32s3.yaml`](example-seeed-xiao-esp32s3.yaml)
+- **M5Stack Atom Echo:** [`example-m5stack-atom-echo.yaml`](example-m5stack-atom-echo.yaml)
 
 The key section that pulls the component from GitHub:
 
@@ -74,17 +89,19 @@ esphome run madoka_bridge.yaml --device <ESP32_IP>
 
 If you use the ESPHome Builder add-on in Home Assistant:
 
-1. Create a new device config based on `example.yaml`
+1. Create a new device config based on the example for your board:
+   - `example-seeed-xiao-esp32s3.yaml` for Seeed XIAO ESP32-S3
+   - `example-m5stack-atom-echo.yaml` for M5Stack Atom Echo
 2. Add your BRC1H MAC address to the ESPHome secrets
 3. Install the firmware via the add-on UI
 
 ## How It Works
 
 ```
-Home Assistant ←── ESPHome Native API ←── ESP32-S3 ←── BLE ──→ BRC1H Thermostat
+Home Assistant ←── ESPHome Native API ←── ESP32 ←── BLE ──→ BRC1H Thermostat
 ```
 
-The ESP32-S3 acts as a BLE-to-WiFi bridge:
+The ESP32 acts as a BLE-to-WiFi bridge:
 1. Connects to the BRC1H thermostat over BLE (LE Secure Connections)
 2. Implements the Madoka TLV protocol (chunked commands over GATT)
 3. Polls the device every 60 seconds for state updates
