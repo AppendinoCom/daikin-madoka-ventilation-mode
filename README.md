@@ -107,6 +107,23 @@ The ESP32 acts as a BLE-to-WiFi bridge:
 3. Polls the device every 60 seconds for state updates
 4. Exposes all entities to Home Assistant via the ESPHome native API
 
+## Home Assistant Automation (Low/High)
+
+The ventilation entity supports preset modes `low` and `high`.
+
+If your device action picker only shows on/off/toggle, use a service action in automation:
+
+```yaml
+action:
+  - action: fan.set_preset_mode
+    target:
+      entity_id: fan.rekuperacia
+    data:
+      preset_mode: low
+```
+
+For high mode, change `preset_mode` to `high`.
+
 ## Protocol
 
 The component implements the Daikin Madoka TLV (Tag-Length-Value) protocol:

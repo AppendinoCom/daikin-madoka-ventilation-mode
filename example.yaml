@@ -96,6 +96,7 @@ binary_sensor:
 # ─── Fan (ventilation on/off + low/high) ──────────────────
 fan:
   - platform: madoka_ble
+    id: rekuperacia_fan
     name: "Rekuperacia"
 
 # ─── Text Sensors ───────────────────────────────────────────
@@ -115,5 +116,19 @@ button:
   - platform: madoka_ble
     reset_filter:
       name: "Reset Filter"
+  - platform: template
+    name: "Rekuperacia Low"
+    on_press:
+      - lambda: |-
+          auto call = id(rekuperacia_fan).turn_on();
+          call.set_preset_mode("low");
+          call.perform();
+  - platform: template
+    name: "Rekuperacia High"
+    on_press:
+      - lambda: |-
+          auto call = id(rekuperacia_fan).turn_on();
+          call.set_preset_mode("high");
+          call.perform();
   - platform: restart
     name: "Restart"
