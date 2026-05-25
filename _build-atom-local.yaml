@@ -1,0 +1,103 @@
+# TEMP build config — používa LOKÁLNY opravený komponent (nie GitHub).
+# Identický s example-m5stack-atom-echo.yaml, len external_components -> type: local.
+# Po úspešnom flashnutí môžeš tento súbor zmazať.
+
+esphome:
+  name: madoka-bridge-atom
+  friendly_name: "Madoka BLE Bridge (Atom Echo)"
+
+esp32:
+  board: m5stack-atom
+  framework:
+    type: esp-idf
+    version: recommended
+    sdkconfig_options:
+      CONFIG_BT_ENABLED: "y"
+      CONFIG_BTDM_CTRL_MODE_BLE_ONLY: "y"
+      CONFIG_BT_BLUEDROID_ENABLED: "y"
+      CONFIG_BT_BLE_SMP_ENABLE: "y"
+      CONFIG_BT_BLE_42_FEATURES_SUPPORTED: "y"
+      CONFIG_BT_BLE_STORE_BONDED_DEVICES: "y"
+
+# Lokálny opravený komponent
+external_components:
+  - source:
+      type: local
+      path: components
+    components: [madoka_ble]
+
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Madoka-Bridge-Fallback"
+    password: !secret ap_password
+
+captive_portal:
+
+madoka_ble:
+  mac_address: !secret madoka_mac
+  poll_interval: 60s
+
+sensor:
+  - platform: madoka_ble
+    indoor_temperature:
+      name: "Indoor Temperature"
+    outdoor_temperature:
+      name: "Outdoor Temperature"
+    cooling_setpoint:
+      name: "Cooling Setpoint"
+    heating_setpoint:
+      name: "Heating Setpoint"
+
+binary_sensor:
+  - platform: madoka_ble
+    filter_alert:
+      name: "Filter Alert"
+
+fan:
+  - platform: madoka_ble
+    id: rekuperacia_fan
+    name: "Rekuperacia"
+
+text_sensor:
+  - platform: madoka_ble
+    firmware_version:
+      name: "Firmware Version"
+
+number:
+  - platform: madoka_ble
+    eye_brightness:
+      name: "Eye Brightness"
+
+button:
+  - platform: madoka_ble
+    reset_filter:
+      name: "Reset Filter"
+  - platform: template
+    name: "Rekuperacia Low"
+    on_press:
+      - lambda: |-
+          auto call = id(rekuperacia_fan).turn_on();
+          call.set_preset_mode("low");
+          call.perform();
+  - platform: template
+    name: "Rekuperacia High"
+    on_press:
+      - lambda: |-
+          auto call = id(rekuperacia_fan).turn_on();
+          call.set_preset_mode("high");
+          call.perform();
+  - platform: restart
+    name: "Restart"
