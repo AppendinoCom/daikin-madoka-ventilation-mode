@@ -315,7 +315,7 @@ class MadokaClimate : public esphome::climate::Climate, public esphome::Componen
 
   esphome::climate::ClimateTraits traits() override {
     auto traits = esphome::climate::ClimateTraits();
-    traits.set_supports_current_temperature(true);
+    traits.add_feature_flags(esphome::climate::CLIMATE_SUPPORTS_CURRENT_TEMPERATURE);
     traits.set_supported_modes({
         esphome::climate::CLIMATE_MODE_OFF,
         esphome::climate::CLIMATE_MODE_FAN_ONLY,
