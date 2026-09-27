@@ -3,6 +3,21 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.const import CONF_ID, CONF_MAC_ADDRESS
 
+# ESPHome 2026.x excludes the ESP-IDF "bt" component from the build unless a
+# component requests it — without this, esp_bt.h is not found at compile time.
+try:
+    from esphome.components.esp32 import request_bluetooth
+except ImportError:  # older ESPHome
+    try:
+        from esphome.components.esp32 import include_builtin_idf_component
+
+        def request_bluetooth():
+            include_builtin_idf_component("bt")
+
+    except ImportError:  # ESPHome without IDF component exclusion
+        def request_bluetooth():
+            pass
+
 CODEOWNERS = ["@peterfridrich"]
 DEPENDENCIES = ["esp32"]
 AUTO_LOAD = ["sensor", "climate", "fan", "binary_sensor", "text_sensor", "number", "button"]
@@ -24,6 +39,8 @@ CONFIG_SCHEMA = cv.Schema(
 async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
+
+    request_bluetooth()
 
     mac = config[CONF_MAC_ADDRESS]
     cg.add(var.set_mac_address(mac.as_hex))
