@@ -45,6 +45,7 @@ external_components:
       type: git
       url: https://github.com/AppendinoCom/daikin-madoka-ventilation-mode
       ref: main
+    refresh: always  # always fetch latest component code (default: 1d cache)
     components: [madoka_ble]
 
 logger:
